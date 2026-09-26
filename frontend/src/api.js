@@ -1,4 +1,4 @@
-const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API = import.meta.env.VITE_API_URL || "https://refaccionaria-fp6g.onrender.com/";
 
 export function getToken() {
   return localStorage.getItem("token");
