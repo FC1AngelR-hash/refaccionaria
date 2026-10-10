@@ -2,8 +2,20 @@ create table if not exists public.perfiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text unique not null,
   nombre text not null,
+  rol text not null default 'cliente' check (rol in ('admin', 'cliente')),
   creado_en timestamptz default now()
 );
+
+-- Si la tabla ya existía sin rol, esto lo agrega:
+alter table public.perfiles
+  add column if not exists rol text not null default 'cliente';
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'perfiles_rol_check') then
+    alter table public.perfiles
+      add constraint perfiles_rol_check check (rol in ('admin', 'cliente'));
+  end if;
+end $$;
 
 create table if not exists public.autos (
   id uuid primary key default gen_random_uuid(),
@@ -51,3 +63,9 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- RLS activo sin políticas: el acceso directo con la anon key queda bloqueado
+-- y todo pasa por el backend (service_role), que valida el rol.
+
+-- Para crear tu primer administrador (cambia el correo) después de registrarte:
+-- update public.perfiles set rol = 'admin' where email = 'tu-correo@ejemplo.com';

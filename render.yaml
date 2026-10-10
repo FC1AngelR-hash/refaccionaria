@@ -1,11 +1,15 @@
 services:
+  # ---------- API (Express) ----------
   - type: web
     name: refaccionaria-api
     runtime: node
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /health
     envVars:
+      - key: NODE_VERSION
+        value: 20
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
@@ -14,7 +18,10 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
+      - key: ADMIN_EMAILS
+        sync: false
 
+  # ---------- Frontend (Vite estático) ----------
   - type: web
     name: refaccionaria-web
     runtime: static
@@ -22,5 +29,11 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
+      - key: NODE_VERSION
+        value: 20
       - key: VITE_API_URL
         sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
