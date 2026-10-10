@@ -22,13 +22,15 @@ Regístrate en la app (queda como `cliente`) y haz una de estas dos cosas:
 
 Después, desde la pestaña **usuarios** puedes promover a otros a admin.
 
-## 4. GitHub + Render
+## 4. GitHub + Render (un solo Web Service)
 ```bash
-git add -A && git commit -m "Corrige despliegue y agrega roles" && git push origin main
+git add -A && git commit -m "Un solo servicio en Render" && git push origin main
 ```
-En Render: **New + > Blueprint**, elige el repo (usa `render.yaml`). Variables:
-- **refaccionaria-api**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `FRONTEND_URL` (URL del sitio estático, sin `/` final), `ADMIN_EMAILS`.
-- **refaccionaria-web**: `VITE_API_URL` (URL de la API, sin `/` final).
+En Render, en el Web Service:
+- **Root Directory:** vacío
+- **Build Command:** `npm --prefix frontend install && npm --prefix frontend run build && npm --prefix backend install`
+- **Start Command:** `npm --prefix backend start`
+- **Variables:** `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_EMAILS`.
+  (`FRONTEND_URL` y `VITE_API_URL` ya no hacen falta: página y API comparten dirección.)
 
-`VITE_API_URL` se incrusta al compilar: si la cambias, haz **Manual Deploy > Clear build cache & deploy** en el sitio web.
 Nunca subas los `.env` (ya están en `.gitignore`).

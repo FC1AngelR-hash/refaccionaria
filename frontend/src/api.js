@@ -1,9 +1,7 @@
-const URL_PRODUCCION = "https://refaccionaria-fp6g.onrender.com";
-
+// Por defecto, en producción usa la misma dirección del sitio (la API sirve la página).
 // Sin "/" final para no generar rutas como "//api/..." (causa de 404).
 const API = (
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? "http://localhost:3000" : URL_PRODUCCION)
+  import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "http://localhost:3000" : "")
 ).replace(/\/+$/, "");
 
 export function getToken() {

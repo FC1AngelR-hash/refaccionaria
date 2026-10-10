@@ -1,5 +1,8 @@
 import "dotenv/config";
 import express from "express";
+import path from "node:path";
+import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 import cors from "cors";
 import { supabase, supabaseAdmin } from "./db.js";
 import { requireAuth, requireAdmin, obtenerPerfil } from "./auth.js";
@@ -33,7 +36,6 @@ app.use((req, _res, next) => {
 
 const h = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
-app.get("/", (_req, res) => res.json({ servicio: "refaccionaria-api", ok: true }));
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 // ---------- Auth ----------
@@ -231,6 +233,15 @@ app.delete(
     res.json({ ok: true });
   })
 );
+
+// ---------- Frontend (si existe frontend/dist, la API también sirve la página) ----------
+const dist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../frontend/dist");
+if (fs.existsSync(path.join(dist, "index.html"))) {
+  app.use(express.static(dist));
+  app.get(/^\/(?!api\/|health).*/, (_req, res) => res.sendFile(path.join(dist, "index.html")));
+} else {
+  app.get("/", (_req, res) => res.json({ servicio: "refaccionaria-api", ok: true }));
+}
 
 app.use((_req, res) => res.status(404).json({ error: "Ruta no encontrada" }));
 
